@@ -41,7 +41,10 @@ def pick_count(level: str) -> int:
         return 1
     if level == "중간":
         return random.choices([1, 2, 3], weights=[50, 40, 10], k=1)[0]
-    return random.choices([1, 2, 3], weights=[85, 10, 5], k=1)[0]
+
+    # ✅ 어려움 확률 설정
+    # 1개: 40%, 2개: 30%, 3개: 20%, 4개: 6%, 5개: 4%
+    return random.choices([1, 2, 3, 4, 5], weights=[40, 30, 20, 6, 4], k=1)[0]
 
 def make_round(level: str):
     colors = palette(level)
@@ -77,25 +80,37 @@ with h1:
     st.markdown("## 🎯 지금 나오는 색을 몸으로 표현해요!")
 with h2:
     st.write("")  # 높이 맞춤
-    # ✅ 작은 버튼(폭 고정, container_width 사용 안 함)
     if st.button("다음 ▶"):
         st.session_state.body_round = make_round(level)
         st.rerun()
-        
+
 round_items = st.session_state.body_round
 k = len(round_items)
-Q_SIZE = 520 if level == "어려움" and k == 1 else 440
 
-# 문제 동그라미
+# 동그라미 크기(개수 많아지면 자동으로 줄이기)
+if k == 1:
+    Q_SIZE = 520 if level == "어려움" else 440
+elif k == 2:
+    Q_SIZE = 420
+elif k == 3:
+    Q_SIZE = 360
+elif k == 4:
+    Q_SIZE = 300
+else:  # k == 5
+    Q_SIZE = 270
+
+# 문제 동그라미 배치
 if k == 1:
     show_circle_center(round_items[0]["hex"], size=Q_SIZE)
+
 elif k == 2:
     spacerL, c1, c2, spacerR = st.columns([1, 2, 2, 1])
     with c1:
         show_circle(round_items[0]["hex"], size=Q_SIZE)
     with c2:
         show_circle(round_items[1]["hex"], size=Q_SIZE)
-else:
+
+elif k == 3:
     spacerL, c1, c2, c3, spacerR = st.columns([1, 2, 2, 2, 1])
     with c1:
         show_circle(round_items[0]["hex"], size=Q_SIZE)
@@ -104,12 +119,29 @@ else:
     with c3:
         show_circle(round_items[2]["hex"], size=Q_SIZE)
 
-# ✅ 문제 바로 아래에 "큰" 다음문제 버튼
-# spL, btnC, spR = st.columns([1, 2, 1])
-# with btnC:
-#     if st.button("➡️ 다음 문제", use_container_width=True):
-#         st.session_state.body_round = make_round(level)
-#         st.rerun()
+elif k == 4:
+    spacerL, c1, c2, c3, c4, spacerR = st.columns([1, 2, 2, 2, 2, 1])
+    with c1:
+        show_circle(round_items[0]["hex"], size=Q_SIZE)
+    with c2:
+        show_circle(round_items[1]["hex"], size=Q_SIZE)
+    with c3:
+        show_circle(round_items[2]["hex"], size=Q_SIZE)
+    with c4:
+        show_circle(round_items[3]["hex"], size=Q_SIZE)
+
+else:  # k == 5
+    spacerL, c1, c2, c3, c4, c5, spacerR = st.columns([1, 2, 2, 2, 2, 2, 1])
+    with c1:
+        show_circle(round_items[0]["hex"], size=Q_SIZE)
+    with c2:
+        show_circle(round_items[1]["hex"], size=Q_SIZE)
+    with c3:
+        show_circle(round_items[2]["hex"], size=Q_SIZE)
+    with c4:
+        show_circle(round_items[3]["hex"], size=Q_SIZE)
+    with c5:
+        show_circle(round_items[4]["hex"], size=Q_SIZE)
 
 # -----------------------------
 # 서브: 동작 규칙(접어서 보기)
